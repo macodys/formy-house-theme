@@ -7,6 +7,25 @@
     <div class="hero-banner__text">
       <h1 class="hero-banner__heading">{{ section.settings.heading | default: 'Welcome to Formy House' }}</h1>
       <p class="hero-banner__subheading">{{ section.settings.subheading | default: 'Curated home decor for modern living' }}</p>
+      <div class="hero-banner__category-buttons">
+        <a href="/collections/candles" class="hero-banner__category-button">
+          <div class="hero-banner__category-icon hero-banner__category-icon--candle"></div>
+          <span>Candles</span>
+        </a>
+        <a href="/collections/lighting" class="hero-banner__category-button">
+          <div class="hero-banner__category-icon hero-banner__category-icon--lighting"></div>
+          <span>Lighting</span>
+        </a>
+        <a href="/collections/decor" class="hero-banner__category-button">
+          <div class="hero-banner__category-icon hero-banner__category-icon--decor"></div>
+          <span>Decor</span>
+        </a>
+        <a href="/collections/sculptures" class="hero-banner__category-button">
+          <div class="hero-banner__category-icon hero-banner__category-icon--sculpture"></div>
+          <span>Sculptures</span>
+        </a>
+      </div>
+      
       <div class="hero-banner__buttons">
         {% if section.settings.button_text != blank %}
           <a href="{{ section.settings.button_link }}" class="hero-banner__button hero-banner__button--primary">
@@ -65,6 +84,106 @@
     color: var(--color-text-muted);
     margin: 0 0 3rem 0;
     font-weight: 300;
+  }
+
+  .hero-banner__category-buttons {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hero-banner__category-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1.5rem;
+    background: linear-gradient(145deg, var(--color-card-bg), var(--color-dark-bg));
+    border-radius: 15px;
+    text-decoration: none;
+    color: var(--color-text-light);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 120px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-banner__category-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    border-color: rgba(212, 175, 55, 0.3);
+  }
+
+  .hero-banner__category-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .hero-banner__category-button:hover::before {
+    opacity: 1;
+  }
+
+  .hero-banner__category-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-banner__category-icon--candle {
+    background: linear-gradient(145deg, var(--color-gold), var(--color-gold-dark));
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+  }
+
+  .hero-banner__category-icon--candle::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background: #ff6b35;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ff6b35;
+    animation: flicker 2s ease-in-out infinite alternate;
+  }
+
+  .hero-banner__category-icon--lighting {
+    background: linear-gradient(145deg, var(--color-surface), var(--color-card-bg));
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+  }
+
+  .hero-banner__category-icon--decor {
+    background: linear-gradient(145deg, var(--color-warm-brown), var(--color-warm-brown-dark));
+    box-shadow: 0 0 15px rgba(139, 115, 85, 0.4);
+  }
+
+  .hero-banner__category-icon--sculpture {
+    background: linear-gradient(145deg, #666, #444);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+  }
+
+  .hero-banner__category-button span {
+    font-size: 1.4rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 1;
   }
 
   .hero-banner__buttons {
@@ -241,6 +360,25 @@
 
     .hero-banner__heading {
       font-size: 3rem;
+    }
+
+    .hero-banner__category-buttons {
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .hero-banner__category-button {
+      padding: 1.5rem 1rem;
+      min-width: 100px;
+    }
+
+    .hero-banner__category-icon {
+      width: 50px;
+      height: 50px;
+    }
+
+    .hero-banner__category-button span {
+      font-size: 1.2rem;
     }
 
     .hero-banner__visual {
