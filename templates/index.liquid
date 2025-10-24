@@ -1,0 +1,20 @@
+{% comment %}
+  The home page template
+{% endcomment %}
+
+{%- assign hero_image = section.settings.hero_image -%}
+{%- assign hero_heading = section.settings.hero_heading | default: 'Welcome to Formy House' -%}
+{%- assign hero_subheading = section.settings.hero_subheading | default: 'Curated home decor for modern living' -%}
+
+<div class="homepage">
+  {% section 'hero-banner' %}
+  {% section 'category-cards' %}
+  {% section 'featured-products' %}
+</div>
+
+<style>
+  .homepage {
+    background-color: var(--color-background);
+    color: #ffffff;
+  }
+</style>

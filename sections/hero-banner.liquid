@@ -1,0 +1,237 @@
+{% comment %}
+  Hero Banner Section - Dark luxury design with warm lighting
+{% endcomment %}
+
+<div class="hero-banner">
+  <div class="hero-banner__content">
+    <div class="hero-banner__text">
+      <h1 class="hero-banner__heading">{{ section.settings.heading | default: 'Welcome to Formy House' }}</h1>
+      <p class="hero-banner__subheading">{{ section.settings.subheading | default: 'Curated home decor for modern living' }}</p>
+      {% if section.settings.button_text != blank %}
+        <a href="{{ section.settings.button_link }}" class="hero-banner__button">
+          {{ section.settings.button_text }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="hero-banner__visual">
+    <div class="hero-banner__scene">
+      <div class="hero-banner__table">
+        <div class="hero-banner__lamp hero-banner__lamp--spherical"></div>
+        <div class="hero-banner__candle"></div>
+        <div class="hero-banner__lamp hero-banner__lamp--modern"></div>
+        <div class="hero-banner__sculpture"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .hero-banner {
+    position: relative;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .hero-banner__content {
+    flex: 1;
+    padding: 0 5rem;
+    z-index: 2;
+    position: relative;
+  }
+
+  .hero-banner__heading {
+    font-family: var(--font-heading-family);
+    font-size: 4.5rem;
+    font-weight: 300;
+    margin: 0 0 2rem 0;
+    color: #ffffff;
+    line-height: 1.1;
+  }
+
+  .hero-banner__subheading {
+    font-size: 1.8rem;
+    color: #cccccc;
+    margin: 0 0 3rem 0;
+    font-weight: 300;
+  }
+
+  .hero-banner__button {
+    display: inline-block;
+    padding: 1.5rem 3rem;
+    background: var(--color-accent);
+    color: #000;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .hero-banner__button:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+  }
+
+  .hero-banner__visual {
+    flex: 1;
+    position: relative;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-banner__scene {
+    position: relative;
+    width: 100%;
+    height: 80%;
+    background: radial-gradient(circle at center, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+  }
+
+  .hero-banner__table {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 200px;
+    background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+    border-radius: 20px;
+    box-shadow: 
+      0 20px 40px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 2rem;
+  }
+
+  .hero-banner__lamp {
+    position: relative;
+    border-radius: 50%;
+  }
+
+  .hero-banner__lamp--spherical {
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle at 30% 30%, #d4af37, #b8941f);
+    box-shadow: 
+      0 0 30px rgba(212, 175, 55, 0.6),
+      inset 0 0 20px rgba(255, 255, 255, 0.2);
+    animation: glow 3s ease-in-out infinite alternate;
+  }
+
+  .hero-banner__lamp--modern {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+    border-radius: 10px;
+    box-shadow: 
+      0 0 20px rgba(212, 175, 55, 0.4),
+      inset 0 0 10px rgba(255, 255, 255, 0.1);
+  }
+
+  .hero-banner__candle {
+    width: 20px;
+    height: 60px;
+    background: linear-gradient(to bottom, #d4af37, #b8941f);
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+  }
+
+  .hero-banner__candle::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    background: #ff6b35;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #ff6b35;
+    animation: flicker 2s ease-in-out infinite alternate;
+  }
+
+  .hero-banner__sculpture {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(145deg, #666, #444);
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+  }
+
+  @keyframes glow {
+    0% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.2); }
+    100% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.8), inset 0 0 25px rgba(255, 255, 255, 0.3); }
+  }
+
+  @keyframes flicker {
+    0% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+    100% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+  }
+
+  @media (max-width: 768px) {
+    .hero-banner {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .hero-banner__content {
+      padding: 2rem;
+    }
+
+    .hero-banner__heading {
+      font-size: 3rem;
+    }
+
+    .hero-banner__visual {
+      height: 50vh;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Hero Banner",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Welcome to Formy House"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Curated home decor for modern living"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Banner"
+    }
+  ]
+}
+{% endschema %}

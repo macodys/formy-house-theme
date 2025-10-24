@@ -1,0 +1,212 @@
+{% comment %}
+  Header Section - Dark luxury navigation
+{% endcomment %}
+
+<header class="header">
+  <div class="header__container">
+    <div class="header__logo">
+      <a href="{{ routes.root_url }}" class="header__logo-link">
+        <span class="header__logo-text">formy.house</span>
+      </a>
+    </div>
+    
+    <nav class="header__nav">
+      <ul class="header__nav-list">
+        {% for link in linklists[section.settings.menu].links %}
+          <li class="header__nav-item">
+            <a href="{{ link.url }}" class="header__nav-link">{{ link.title }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+    
+    <div class="header__actions">
+      <button class="header__search" aria-label="Search">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M19 19L13 13M15 8C15 11.866 11.866 15 8 15C4.134 15 1 11.866 1 8C1 4.134 4.134 1 8 1C11.866 1 15 4.134 15 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      
+      <a href="{{ routes.cart_url }}" class="header__cart" aria-label="Cart">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M7 4V2C7 1.44772 7.44772 1 8 1H12C12.5523 1 13 1.44772 13 2V4M7 4H5C3.89543 4 3 4.89543 3 6V16C3 17.1046 3.89543 18 5 18H15C16.1046 18 17 17.1046 17 16V6C17 4.89543 16.1046 4 15 4H13M7 4H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {% if cart.item_count > 0 %}
+          <span class="header__cart-count">{{ cart.item_count }}</span>
+        {% endif %}
+      </a>
+      
+      <button class="header__menu-toggle" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(15, 15, 15, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .header__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+  }
+
+  .header__logo-link {
+    text-decoration: none;
+    color: #ffffff;
+  }
+
+  .header__logo-text {
+    font-family: var(--font-heading-family);
+    font-size: 2.4rem;
+    font-weight: 300;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #ffffff, var(--color-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header__nav-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 3rem;
+  }
+
+  .header__nav-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 400;
+    font-size: 1.6rem;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .header__nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--color-accent);
+    transition: width 0.3s ease;
+  }
+
+  .header__nav-link:hover {
+    color: var(--color-accent);
+  }
+
+  .header__nav-link:hover::after {
+    width: 100%;
+  }
+
+  .header__actions {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .header__search,
+  .header__cart {
+    color: #ffffff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 1rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header__search:hover,
+  .header__cart:hover {
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--color-accent);
+  }
+
+  .header__cart-count {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: var(--color-accent);
+    color: #000;
+    font-size: 1.2rem;
+    font-weight: 600;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header__menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 1rem;
+  }
+
+  .header__menu-toggle span {
+    width: 25px;
+    height: 2px;
+    background: #ffffff;
+    transition: all 0.3s ease;
+  }
+
+  @media (max-width: 768px) {
+    .header__nav {
+      display: none;
+    }
+
+    .header__menu-toggle {
+      display: flex;
+    }
+
+    .header__actions {
+      gap: 1rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Header",
+  "tag": "header",
+  "class": "section-header",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    }
+  ]
+}
+{% endschema %}
