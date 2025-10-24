@@ -7,11 +7,18 @@
     <div class="hero-banner__text">
       <h1 class="hero-banner__heading">{{ section.settings.heading | default: 'Welcome to Formy House' }}</h1>
       <p class="hero-banner__subheading">{{ section.settings.subheading | default: 'Curated home decor for modern living' }}</p>
-      {% if section.settings.button_text != blank %}
-        <a href="{{ section.settings.button_link }}" class="hero-banner__button">
-          {{ section.settings.button_text }}
-        </a>
-      {% endif %}
+      <div class="hero-banner__buttons">
+        {% if section.settings.button_text != blank %}
+          <a href="{{ section.settings.button_link }}" class="hero-banner__button hero-banner__button--primary">
+            {{ section.settings.button_text }}
+          </a>
+        {% endif %}
+        {% if section.settings.button_text_secondary != blank %}
+          <a href="{{ section.settings.button_link_secondary }}" class="hero-banner__button hero-banner__button--secondary">
+            {{ section.settings.button_text_secondary }}
+          </a>
+        {% endif %}
+      </div>
     </div>
   </div>
   
@@ -60,23 +67,63 @@
     font-weight: 300;
   }
 
+  .hero-banner__buttons {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
   .hero-banner__button {
     display: inline-block;
     padding: 1.5rem 3rem;
-    background: var(--color-accent);
-    color: #000;
     text-decoration: none;
     border-radius: 50px;
     font-weight: 600;
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
+    font-size: 1.4rem;
+    position: relative;
+    overflow: hidden;
   }
 
-  .hero-banner__button:hover {
+  .hero-banner__button--primary {
+    background: var(--color-accent);
+    color: #000;
+  }
+
+  .hero-banner__button--primary:hover {
     background: #ffffff;
     transform: translateY(-2px);
     box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+  }
+
+  .hero-banner__button--secondary {
+    background: transparent;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+  }
+
+  .hero-banner__button--secondary:hover {
+    background: #ffffff;
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+  }
+
+  .hero-banner__button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .hero-banner__button:hover::before {
+    left: 100%;
   }
 
   .hero-banner__visual {
@@ -220,12 +267,24 @@
     {
       "type": "text",
       "id": "button_text",
-      "label": "Button Text"
+      "label": "Primary Button Text",
+      "default": "Shop Now"
     },
     {
       "type": "url",
       "id": "button_link",
-      "label": "Button Link"
+      "label": "Primary Button Link"
+    },
+    {
+      "type": "text",
+      "id": "button_text_secondary",
+      "label": "Secondary Button Text",
+      "default": "Learn More"
+    },
+    {
+      "type": "url",
+      "id": "button_link_secondary",
+      "label": "Secondary Button Link"
     }
   ],
   "presets": [
