@@ -303,22 +303,40 @@
 
   .product-form__option-value {
     padding: 1rem 2rem;
-    border: 2px solid rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(0, 0, 0, 0.15);
     border-radius: 8px;
     cursor: pointer;
     font-size: 1.4rem;
     transition: all 0.3s ease;
     background: #ffffff;
+    display: inline-block;
+    position: relative;
   }
 
-  .product-form__option-input:checked + .product-form__option-value {
-    border-color: var(--color-accent);
-    background: var(--color-accent);
+  .product-form__option-input:checked + .product-form__option-value,
+  .product-form__option-value.selected {
+    border-color: var(--color-accent, #1a1a1a);
+    background: var(--color-accent, #1a1a1a);
     color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.1);
+    padding-right: 3.5rem;
+  }
+
+  .product-form__option-input:checked + .product-form__option-value::after,
+  .product-form__option-value.selected::after {
+    content: '✓';
+    position: absolute;
+    right: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    font-weight: bold;
   }
 
   .product-form__option-value:hover {
-    border-color: var(--color-accent);
+    border-color: var(--color-accent, #1a1a1a);
+    transform: translateY(-1px);
   }
 
   .product-form__quantity {
@@ -465,8 +483,26 @@
     const variantIdInput = document.getElementById('ProductVariantId');
     
     if (variantInputs.length > 0) {
+      // Update all labels when any variant changes
+      function updateVariantLabels() {
+        variantInputs.forEach(input => {
+          const label = input.nextElementSibling;
+          if (label) {
+            if (input.checked) {
+              label.classList.add('selected');
+            } else {
+              label.classList.remove('selected');
+            }
+          }
+        });
+      }
+      
+      // Set initial state
+      updateVariantLabels();
+      
       variantInputs.forEach(input => {
         input.addEventListener('change', function() {
+          updateVariantLabels();
           updateVariant();
         });
       });
