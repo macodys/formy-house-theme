@@ -2,6 +2,7 @@
   Product Template - Professional product page with variants and gallery
 {% endcomment %}
 
+{% if product %}
 <div class="product-page">
   <div class="product-page__container">
     <div class="product-page__gallery">
@@ -127,6 +128,13 @@
     </div>
   </div>
 </div>
+{% else %}
+  <div class="product-page">
+    <div class="product-page__container">
+      <p>Product not found.</p>
+    </div>
+  </div>
+{% endif %}
 
 <style>
   .product-page {
@@ -562,10 +570,3 @@
     }
   });
 </script>
-
-{% schema %}
-{
-  "name": "Product Page",
-  "settings": []
-}
-{% endschema %}
