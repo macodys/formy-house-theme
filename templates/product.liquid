@@ -500,6 +500,9 @@
       // Set initial state
       updateVariantLabels();
       
+      // Update variant on page load to ensure image matches selected variant
+      updateVariant();
+      
       variantInputs.forEach(input => {
         input.addEventListener('change', function() {
           updateVariantLabels();
@@ -508,6 +511,8 @@
       });
     }
 
+    let isInitialLoad = true;
+    
     function updateVariant() {
       const selectedOptions = {};
       variantInputs.forEach(input => {
@@ -528,8 +533,16 @@
           compare_at_priceFormatted: {% if variant.compare_at_price %}'{{ variant.compare_at_price | money }}'{% else %}null{% endif %},
           available: {{ variant.available | json }},
           options: {{ variant.options | json }},
-          featured_image: {% if variant.featured_image %}'{{ variant.featured_image | image_url: width: 1200 }}'{% else %}null{% endif %}
+          featured_image: {% if variant.featured_image %}'{{ variant.featured_image | image_url: width: 1200 }}'{% else %}null{% endif %},
+          image: {% if variant.image %}'{{ variant.image | image_url: width: 1200 }}'{% else %}null{% endif %}
         }{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      ];
+      
+      // Product images array for fallback
+      const productImages = [
+        {% for image in product.images %}
+        '{{ image | image_url: width: 1200 }}'{% unless forloop.last %},{% endunless %}
         {% endfor %}
       ];
 
@@ -591,15 +604,44 @@
           }
         }
 
-        // Update image if variant has different image
-        if (matchingVariant.featured_image && mainImage) {
-          mainImage.src = matchingVariant.featured_image;
+        // Update image when variant changes
+        if (mainImage) {
+          // Determine which image to show: variant featured_image > variant image > first product image
+          let imageToShow = matchingVariant.featured_image || matchingVariant.image;
           
-          // Update thumbnail if it exists
-          const matchingThumbnail = document.querySelector(`[data-image-src="${matchingVariant.featured_image}"]`);
-          if (matchingThumbnail) {
-            thumbnails.forEach(t => t.classList.remove('active'));
-            matchingThumbnail.classList.add('active');
+          // If no variant-specific image, use the first product image as fallback
+          if (!imageToShow && productImages.length > 0) {
+            imageToShow = productImages[0];
+          }
+          
+          if (imageToShow && mainImage.src !== imageToShow) {
+            // Add smooth fade transition (skip on initial load)
+            if (!isInitialLoad) {
+              mainImage.style.opacity = '0';
+              
+              setTimeout(() => {
+                mainImage.src = imageToShow;
+                mainImage.style.opacity = '1';
+              }, 200);
+            } else {
+              mainImage.src = imageToShow;
+              isInitialLoad = false;
+            }
+            
+            // Update thumbnail to match if it exists
+            const matchingThumbnail = document.querySelector(`[data-image-src="${imageToShow}"]`);
+            if (matchingThumbnail) {
+              thumbnails.forEach(t => t.classList.remove('active'));
+              matchingThumbnail.classList.add('active');
+            } else if (thumbnails.length > 0) {
+              // If exact match not found, activate first thumbnail
+              thumbnails.forEach(t => t.classList.remove('active'));
+              if (thumbnails[0]) {
+                thumbnails[0].classList.add('active');
+              }
+            }
+          } else {
+            isInitialLoad = false;
           }
         }
       }
