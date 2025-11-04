@@ -57,49 +57,51 @@
         </div>
         
         <form action="/cart/add" method="post" enctype="multipart/form-data" class="product-form" id="ProductForm">
-          {% unless product.has_only_default_variant %}
-            <div class="product-form__variants">
-              {% for option in product.options_with_values %}
-                <div class="product-form__option">
-                  <label class="product-form__option-label" for="Option{{ forloop.index }}">
-                    {{ option.name }}
-                  </label>
-                  <div class="product-form__option-values">
-                    {% for value in option.values %}
-                      <input 
-                        type="radio" 
-                        id="Option{{ forloop.parentloop.index }}-{{ forloop.index }}"
-                        name="options[{{ option.name | escape }}]"
-                        value="{{ value | escape }}"
-                        {% if option.selected_value == value %}checked{% endif %}
-                        class="product-form__option-input"
-                      >
-                      <label 
-                        for="Option{{ forloop.parentloop.index }}-{{ forloop.index }}"
-                        class="product-form__option-value"
-                      >
-                        {{ value }}
-                      </label>
-                    {% endfor %}
+          <div class="product-form__options-container">
+            {% unless product.has_only_default_variant %}
+              <div class="product-form__variants">
+                {% for option in product.options_with_values %}
+                  <div class="product-form__option">
+                    <label class="product-form__option-label" for="Option{{ forloop.index }}">
+                      {{ option.name }}
+                    </label>
+                    <div class="product-form__option-values">
+                      {% for value in option.values %}
+                        <input 
+                          type="radio" 
+                          id="Option{{ forloop.parentloop.index }}-{{ forloop.index }}"
+                          name="options[{{ option.name | escape }}]"
+                          value="{{ value | escape }}"
+                          {% if option.selected_value == value %}checked{% endif %}
+                          class="product-form__option-input"
+                        >
+                        <label 
+                          for="Option{{ forloop.parentloop.index }}-{{ forloop.index }}"
+                          class="product-form__option-value"
+                        >
+                          {{ value }}
+                        </label>
+                      {% endfor %}
+                    </div>
                   </div>
-                </div>
-              {% endfor %}
-            </div>
-          {% endunless %}
-          
-          <div class="product-form__quantity">
-            <label for="Quantity" class="product-form__quantity-label">Quantity</label>
-            <div class="product-form__quantity-controls">
-              <button type="button" class="product-form__quantity-btn" data-action="decrease">−</button>
-              <input 
-                type="number" 
-                id="Quantity" 
-                name="quantity" 
-                value="1" 
-                min="1"
-                class="product-form__quantity-input"
-              >
-              <button type="button" class="product-form__quantity-btn" data-action="increase">+</button>
+                {% endfor %}
+              </div>
+            {% endunless %}
+            
+            <div class="product-form__quantity">
+              <label for="Quantity" class="product-form__quantity-label">Quantity</label>
+              <div class="product-form__quantity-controls">
+                <button type="button" class="product-form__quantity-btn" data-action="decrease">−</button>
+                <input 
+                  type="number" 
+                  id="Quantity" 
+                  name="quantity" 
+                  value="1" 
+                  min="1"
+                  class="product-form__quantity-input"
+                >
+                <button type="button" class="product-form__quantity-btn" data-action="increase">+</button>
+              </div>
             </div>
           </div>
           
@@ -438,17 +440,8 @@
     gap: 3rem;
   }
 
-  .product-form__variants {
-    display: flex;
-    flex-direction: column;
-    gap: 2.5rem;
-  }
-
-  .product-form__option {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    padding: 2rem;
+  .product-form__options-container {
+    padding: 2.5rem;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%);
     border-radius: 12px;
     border: 1px solid rgba(0, 0, 0, 0.08);
@@ -457,7 +450,7 @@
     overflow: hidden;
   }
 
-  .product-form__option::before {
+  .product-form__options-container::before {
     content: '';
     position: absolute;
     top: 0;
@@ -468,22 +461,24 @@
     border-radius: 0 2px 2px 0;
   }
 
+  .product-form__variants {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .product-form__option {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
   .product-form__option-label {
     font-size: 1.7rem;
     font-weight: 600;
     color: var(--color-primary, #1a1a1a);
     letter-spacing: -0.01em;
     margin-bottom: 0.5rem;
-    position: relative;
-    padding-left: 1rem;
-  }
-
-  .product-form__option-label::before {
-    content: '▸';
-    position: absolute;
-    left: 0;
-    color: var(--color-accent, #1a1a1a);
-    font-size: 1.2rem;
   }
 
   .product-form__option-values {
@@ -547,24 +542,9 @@
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
-    padding: 2rem;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%);
-    border-radius: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .product-form__quantity::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 3px;
-    height: 100%;
-    background: linear-gradient(180deg, var(--color-accent, #1a1a1a) 0%, rgba(26, 26, 26, 0.3) 100%);
-    border-radius: 0 2px 2px 0;
+    margin-top: 2.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
   }
 
   .product-form__quantity-label {
@@ -572,16 +552,7 @@
     font-weight: 600;
     color: var(--color-primary, #1a1a1a);
     letter-spacing: -0.01em;
-    position: relative;
-    padding-left: 1rem;
-  }
-
-  .product-form__quantity-label::before {
-    content: '▸';
-    position: absolute;
-    left: 0;
-    color: var(--color-accent, #1a1a1a);
-    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
   }
 
   .product-form__quantity-controls {
@@ -727,8 +698,8 @@
       font-size: 1.5rem;
     }
 
-    .product-form__option {
-      padding: 1.5rem;
+    .product-form__options-container {
+      padding: 2rem;
     }
 
     .product-form__option-label {
@@ -741,7 +712,8 @@
     }
 
     .product-form__quantity {
-      padding: 1.5rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
     }
 
     .product-form__quantity-label {
