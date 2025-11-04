@@ -6,11 +6,22 @@
   <div class="collection-view__container">
     {% if section.settings.heading != blank %}
       <h2 class="collection-view__title">{{ section.settings.heading }}</h2>
+    {% elsif collection %}
+      <h2 class="collection-view__title">{{ collection.title }}</h2>
     {% endif %}
     
     <div class="collection-view__grid">
-      {% for product in collections[section.settings.collection].products limit: section.settings.products_to_show %}
-        <div class="product-card">
+      {% if section.settings.collection != blank %}
+        {% assign selected_collection = collections[section.settings.collection] %}
+      {% elsif collection %}
+        {% assign selected_collection = collection %}
+      {% else %}
+        {% assign selected_collection = collections['all'] %}
+      {% endif %}
+      
+      {% if selected_collection != blank and selected_collection.products.size > 0 %}
+        {% for product in selected_collection.products limit: section.settings.products_to_show %}
+          <div class="product-card">
           {% if product.featured_image %}
             <img 
               src="{{ product.featured_image | image_url: width: 600 }}" 
@@ -45,7 +56,12 @@
             </div>
           </section>
         </div>
-      {% endfor %}
+        {% endfor %}
+      {% else %}
+        <div class="collection-view__empty">
+          <p>No products found in this collection. Please select a collection with products in the theme editor.</p>
+        </div>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -76,6 +92,14 @@
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 3rem;
     justify-items: center;
+  }
+
+  .collection-view__empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 1.6rem;
   }
 
   .product-card {
