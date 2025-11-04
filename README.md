@@ -1,73 +1,79 @@
-# Formy House Shopify Theme
+# Formy.House Shopify Theme
 
-A custom Shopify theme for formy.house - a dark luxury home decor theme with smooth animations and modern design.
+A modern, elegant Shopify theme for **Formy.House** - a curated home decor store with clean design and intuitive navigation.
 
 ## Features
 
-- **Dark Luxury Design**: Sophisticated dark theme with warm golden accents
-- **Smooth Animations**: Scroll-triggered animations for featured products
-- **Responsive Design**: Mobile-first approach with beautiful desktop experience
-- **Modern Typography**: Clean, readable fonts with proper hierarchy
+- **Modern Design**: Clean, minimalist aesthetic inspired by leading home decor websites
+- **Responsive Layout**: Mobile-first approach with seamless experience across all devices
+- **Product Showcase**: Beautiful category and product display sections
+- **Smooth Interactions**: Elegant hover effects and transitions
 - **Performance Optimized**: Fast loading with lazy loading and optimized assets
 
 ## Theme Sections
 
-### Hero Banner
-- Full-screen hero section with animated lighting elements
-- Customizable heading, subheading, and call-to-action button
-- Animated lamps, candles, and sculptures matching the reference design
+### Header
+- Sticky navigation with smooth transitions
+- Integrated search functionality
+- Shopping cart integration
+- Mobile-responsive hamburger menu
 
-### Category Cards
-- Four product category cards (Candles, Lighting, Decor, Sculptures)
-- Hover effects with smooth transitions
-- Customizable images and links
+### Hero Section
+- Large, impactful banner area
+- Two-column layout (text + image)
+- Customizable heading, subheading, and CTA button
+- Fully responsive design
+
+### Category Showcase
+- Grid layout for category cards
+- Image-based navigation cards
+- Hover effects with lift animation
+- Customizable categories via Shopify editor
 
 ### Featured Products
-- Scroll-triggered animations
-- Product grid with hover effects
-- Configurable collection and number of products
-- Smooth fade-in animations
-
-### Header
-- Fixed navigation with scroll behavior
-- Search functionality
-- Mobile-responsive menu
-- Cart integration
+- Product grid with high-quality images
+- Price display with sale price support
+- Hover effects on product cards
+- Collection-based product selection
 
 ### Footer
-- Multi-column layout with social links
-- Company information and legal links
-- Responsive design
+- Multi-column layout
+- Social media links (Facebook, Instagram, Pinterest)
+- Customizable link lists
+- Brand information
 
 ## Installation
 
 1. Download or clone this repository
 2. Zip the theme files
-3. Upload to your Shopify store via the admin panel
-4. Customize the theme settings in the Shopify admin
+3. Upload to your Shopify store via the admin panel (Online Store > Themes > Upload theme)
+4. Customize the theme settings in the Shopify theme editor
 
 ## Customization
 
 ### Colors
-- Primary Color: Dark backgrounds (#1a1a1a)
-- Accent Color: Golden yellow (#d4af37)
-- Background: Deep black (#0f0f0f)
+- Primary Color: Brand primary (#1a1a1a)
+- Accent Color: Brand accent (#d4af37)
+- Background: Site background (#ffffff)
+- Text Color: Main text color (#1a1a1a)
 
 ### Typography
-- Heading Font: Clean, modern sans-serif
-- Body Font: Readable sans-serif
+- Heading Font: Customizable via theme settings
+- Body Font: Customizable via theme settings
 
-### Animations
-- Scroll-triggered animations for featured products
-- Hover effects on cards and buttons
-- Smooth transitions throughout
+### Sections
+All sections are customizable through the Shopify theme editor:
+- Add/remove categories
+- Configure featured products collection
+- Customize hero content and images
+- Update footer links and social media
 
 ## Development
 
 This theme is built with:
-- Liquid templating
+- Liquid templating language
 - CSS3 with custom properties
-- Vanilla JavaScript for animations
+- Vanilla JavaScript for interactions
 - Mobile-first responsive design
 
 ## Browser Support
@@ -76,11 +82,11 @@ This theme is built with:
 - Firefox (latest)
 - Safari (latest)
 - Edge (latest)
-- Mobile browsers
+- Mobile browsers (iOS Safari, Chrome Mobile)
 
 ## License
 
-This theme is created for formy.house and is proprietary.
+This theme is created for **Formy.House** and is proprietary.
 
 ## Support
 
