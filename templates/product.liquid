@@ -56,12 +56,6 @@
           {% endif %}
         </div>
         
-        {% if product.description != blank %}
-          <div class="product-info__description">
-            {{ product.description }}
-          </div>
-        {% endif %}
-        
         <form action="/cart/add" method="post" enctype="multipart/form-data" class="product-form" id="ProductForm">
           {% unless product.has_only_default_variant %}
             <div class="product-form__variants">
@@ -124,6 +118,12 @@
             {% endif %}
           </button>
         </form>
+        
+        {% if product.description != blank %}
+          <div class="product-info__description">
+            {{ product.description }}
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>
