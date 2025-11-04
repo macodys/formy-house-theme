@@ -251,18 +251,146 @@
   }
 
   .product-info__description {
-    margin-bottom: 3rem;
-    font-size: 1.6rem;
-    line-height: 1.8;
-    color: rgba(0, 0, 0, 0.7);
+    margin-bottom: 4rem;
+    margin-top: 2rem;
+    padding: 3rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 248, 248, 0.9) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.04);
+    font-size: 1.7rem;
+    line-height: 1.85;
+    color: rgba(0, 0, 0, 0.75);
+    letter-spacing: 0.01em;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-info__description::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--color-accent, #1a1a1a) 0%, rgba(26, 26, 26, 0.3) 100%);
+    border-radius: 2px 0 0 2px;
+  }
+
+  .product-info__description > *:first-child {
+    margin-top: 0;
+  }
+
+  .product-info__description > *:last-child {
+    margin-bottom: 0;
+  }
+
+  .product-info__description p {
+    margin-bottom: 1.5rem;
+    font-weight: 300;
   }
 
   .product-info__description h1,
   .product-info__description h2,
-  .product-info__description h3 {
+  .product-info__description h3,
+  .product-info__description h4 {
     font-family: var(--font-heading-family);
-    margin-top: 2rem;
-    margin-bottom: 1rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1.2rem;
+    font-weight: 400;
+    color: var(--color-primary, #1a1a1a);
+    letter-spacing: -0.02em;
+  }
+
+  .product-info__description h1 {
+    font-size: 2.4rem;
+  }
+
+  .product-info__description h2 {
+    font-size: 2rem;
+  }
+
+  .product-info__description h3 {
+    font-size: 1.8rem;
+  }
+
+  .product-info__description h4 {
+    font-size: 1.6rem;
+  }
+
+  .product-info__description ul,
+  .product-info__description ol {
+    margin: 1.5rem 0;
+    padding-left: 2.5rem;
+    list-style-position: outside;
+  }
+
+  .product-info__description ul {
+    list-style-type: none;
+  }
+
+  .product-info__description ul li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .product-info__description ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent, #1a1a1a);
+    font-size: 1.2rem;
+    line-height: 1.5;
+  }
+
+  .product-info__description ol {
+    list-style-type: decimal;
+  }
+
+  .product-info__description ol li {
+    margin-bottom: 0.8rem;
+  }
+
+  .product-info__description a {
+    color: var(--color-accent, #1a1a1a);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(26, 26, 26, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .product-info__description a:hover {
+    border-bottom-color: var(--color-accent, #1a1a1a);
+    color: var(--color-primary, #1a1a1a);
+  }
+
+  .product-info__description strong,
+  .product-info__description b {
+    font-weight: 600;
+    color: var(--color-primary, #1a1a1a);
+  }
+
+  .product-info__description em,
+  .product-info__description i {
+    font-style: italic;
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  .product-info__description blockquote {
+    margin: 2rem 0;
+    padding: 1.5rem 2rem;
+    border-left: 3px solid var(--color-accent, #1a1a1a);
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  .product-info__description hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.1) 50%, transparent 100%);
+    margin: 2.5rem 0;
   }
 
   .product-form {
@@ -433,6 +561,28 @@
 
     .product-info__price-current {
       font-size: 2.4rem;
+    }
+
+    .product-info__description {
+      padding: 2rem;
+      font-size: 1.6rem;
+      margin-top: 1.5rem;
+    }
+
+    .product-info__description h1 {
+      font-size: 2rem;
+    }
+
+    .product-info__description h2 {
+      font-size: 1.8rem;
+    }
+
+    .product-info__description h3 {
+      font-size: 1.6rem;
+    }
+
+    .product-info__description h4 {
+      font-size: 1.5rem;
     }
   }
 </style>
