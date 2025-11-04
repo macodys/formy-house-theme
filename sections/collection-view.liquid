@@ -1,0 +1,385 @@
+{% comment %}
+  Collection View - Card-based product listing
+{% endcomment %}
+
+<div class="collection-view">
+  <div class="collection-view__container">
+    {% if section.settings.heading != blank %}
+      <h2 class="collection-view__title">{{ section.settings.heading }}</h2>
+    {% endif %}
+    
+    <div class="collection-view__grid">
+      {% for product in collections[section.settings.collection].products limit: section.settings.products_to_show %}
+        <div class="product-card">
+          {% if product.featured_image %}
+            <img 
+              src="{{ product.featured_image | image_url: width: 600 }}" 
+              alt="{{ product.title | escape }}"
+              loading="lazy"
+            />
+          {% else %}
+            <div class="product-card__placeholder">
+              <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                <rect width="100" height="100" fill="#f5f5f5"/>
+              </svg>
+            </div>
+          {% endif %}
+          
+          <section>
+            <h2>{{ product.title }}</h2>
+            <p>{{ product.description | strip_html | truncate: 100 }}</p>
+            <div>
+              <div class="tag">
+                <span>{{ product.price | money }}</span>
+                {% if product.compare_at_price > product.price %}
+                  <span class="tag--sale">{{ product.compare_at_price | money }}</span>
+                {% endif %}
+              </div>
+              <button 
+                class="add-to-cart-btn" 
+                data-product-id="{{ product.selected_or_first_available_variant.id }}"
+                data-product-url="{{ product.url }}"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </section>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .collection-view {
+    padding: 8rem 0;
+    background: #f8f8f8;
+  }
+
+  .collection-view__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .collection-view__title {
+    font-family: var(--font-heading-family);
+    font-size: 4rem;
+    font-weight: 300;
+    text-align: center;
+    margin-bottom: 6rem;
+    color: var(--color-primary);
+  }
+
+  .collection-view__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 3rem;
+    justify-items: center;
+  }
+
+  .product-card {
+    --bg: #fff;
+    --title-color: #fff;
+    --title-color-hover: #000;
+    --text-color: #666;
+    --button-color: #eee;
+    --button-color-hover: #ddd;
+    background: var(--bg);
+    border-radius: 2rem;
+    padding: 0.5rem;
+    width: 100%;
+    max-width: 20rem;
+    height: 30rem;
+    overflow: clip;
+    position: relative;
+    font-family: var(--font-body-family);
+    transition: transform 0.3s ease;
+  }
+
+  .product-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .product-card::before {
+    content: "";
+    position: absolute;
+    width: calc(100% - 1rem);
+    height: 30%;
+    bottom: 0.5rem;
+    left: 0.5rem;
+    mask: linear-gradient(#0000, #000f 80%);
+    backdrop-filter: blur(1rem);
+    border-radius: 0 0 1.5rem 1.5rem;
+    translate: 0 0;
+    transition: translate 0.25s;
+    z-index: 1;
+  }
+
+  .product-card > img,
+  .product-card__placeholder {
+    max-width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    object-position: 50% 5%;
+    border-radius: 1.5rem;
+    display: block;
+    transition: aspect-ratio 0.25s, object-position 0.5s;
+    width: 100%;
+    height: auto;
+  }
+
+  .product-card__placeholder {
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product-card > section {
+    margin: 1rem;
+    height: calc(33.3333% - 1rem);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 2;
+  }
+
+  .product-card > section h2 {
+    margin: 0;
+    margin-block-end: 1rem;
+    font-size: 1.5rem;
+    opacity: 0;
+    translate: 0 -200%;
+    color: var(--title-color);
+    transition: color 0.5s, margin-block-end 0.25s, opacity 1s, translate 0.25s;
+    font-family: var(--font-heading-family);
+    font-weight: 400;
+  }
+
+  .product-card > section p {
+    font-size: 0.95rem;
+    line-height: 1.3;
+    color: var(--text-color);
+    opacity: 0;
+    margin: 0;
+    translate: 0 100%;
+    transition: margin-block-end 0.25s, opacity 1s 0.2s, translate 0.25s 0.2s;
+  }
+
+  .product-card > section > div {
+    flex: 1;
+    align-items: flex-end;
+    display: flex;
+    justify-content: space-between;
+    translate: 0 100%;
+    opacity: 0;
+    transition: translate 0.25s 0.2s, opacity 1s;
+  }
+
+  .product-card > section > div .tag {
+    align-self: center;
+    color: var(--title-color-hover);
+    font-weight: 600;
+    font-size: 1.2rem;
+  }
+
+  .product-card > section > div .tag--sale {
+    text-decoration: line-through;
+    opacity: 0.6;
+    font-size: 1rem;
+    margin-left: 0.5rem;
+  }
+
+  .product-card > section > div button {
+    border: 1px solid transparent;
+    border-radius: 1.25rem 1.25rem 1.5rem 1.25rem;
+    font-size: 1rem;
+    padding: 1rem 1.5rem 1rem 2.75rem;
+    translate: 1rem;
+    background: var(--button-color);
+    transition: background 0.33s;
+    outline-offset: 2px;
+    position: relative;
+    color: var(--title-color-hover);
+    cursor: pointer;
+    font-family: var(--font-body-family);
+    font-weight: 500;
+  }
+
+  .product-card > section > div button::before,
+  .product-card > section > div button::after {
+    content: "";
+    width: 0.85rem;
+    height: 0.1rem;
+    background: currentcolor;
+    position: absolute;
+    top: 50%;
+    left: 1.33rem;
+    border-radius: 1rem;
+  }
+
+  .product-card > section > div button::after {
+    rotate: 90deg;
+    transition: rotate 0.15s;
+  }
+
+  .product-card > section > div button:hover {
+    background: var(--button-color-hover);
+  }
+
+  .product-card > section > div button:focus {
+    outline: 2px solid var(--text-color);
+  }
+
+  .product-card:hover::before,
+  .product-card:focus-within::before {
+    translate: 0 100%;
+  }
+
+  .product-card:hover > img,
+  .product-card:focus-within > img {
+    aspect-ratio: 1 / 1;
+    object-position: 50% 10%;
+    transition: aspect-ratio 0.25s, object-position 0.25s;
+  }
+
+  .product-card:hover > section h2,
+  .product-card:hover > section p,
+  .product-card:focus-within > section h2,
+  .product-card:focus-within > section p {
+    translate: 0 0;
+    margin-block-end: 0.5rem;
+    opacity: 1;
+  }
+
+  .product-card:hover > section h2,
+  .product-card:focus-within > section h2 {
+    color: var(--title-color-hover);
+  }
+
+  .product-card:hover > section > div,
+  .product-card:focus-within > section > div {
+    translate: 0 0;
+    opacity: 1;
+    transition: translate 0.25s 0.25s, opacity 0.5s 0.25s;
+  }
+
+  @media (max-width: 768px) {
+    .collection-view {
+      padding: 4rem 0;
+    }
+
+    .collection-view__title {
+      font-size: 3rem;
+      margin-bottom: 4rem;
+    }
+
+    .collection-view__grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .product-card {
+      max-width: 100%;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('.add-to-cart-btn');
+    
+    buttons.forEach(button => {
+      button.addEventListener('click', async function(e) {
+        e.preventDefault();
+        const productId = this.dataset.productId;
+        const productUrl = this.dataset.productUrl;
+        
+        if (!productId) {
+          window.location.href = productUrl;
+          return;
+        }
+
+        const formData = {
+          'items': [{
+            'id': parseInt(productId),
+            'quantity': 1
+          }]
+        };
+
+        try {
+          const response = await fetch('/cart/add.js', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+          });
+
+          if (response.ok) {
+            const button = this;
+            const originalText = button.textContent;
+            button.textContent = 'Added!';
+            button.style.background = '#4caf50';
+            
+            // Reload cart count
+            fetch('/cart.js')
+              .then(response => response.json())
+              .then(cart => {
+                const cartCount = document.querySelector('.header__cart-count');
+                if (cartCount) {
+                  cartCount.textContent = cart.item_count;
+                }
+              });
+            
+            setTimeout(() => {
+              button.textContent = originalText;
+              button.style.background = '';
+            }, 2000);
+          } else {
+            window.location.href = productUrl;
+          }
+        } catch (error) {
+          console.error('Error adding to cart:', error);
+          window.location.href = productUrl;
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Collection View",
+  "tag": "section",
+  "class": "section-collection-view",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop Collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to show",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection View"
+    }
+  ]
+}
+{% endschema %}
