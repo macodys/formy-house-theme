@@ -811,13 +811,16 @@
     let isInitialLoad = true;
     
     function updateVariant() {
+      console.log('=== UPDATE VARIANT CALLED ===');
       const selectedOptions = {};
       variantInputs.forEach(input => {
         if (input.checked) {
           const optionName = input.name.match(/\[(.*?)\]/)[1];
           selectedOptions[optionName] = input.value;
+          console.log('Selected option:', optionName, '=', input.value);
         }
       });
+      console.log('All selected options:', selectedOptions);
 
       // Find matching variant using variant data
       const variantData = [
@@ -854,13 +857,23 @@
         '{{ option.name }}'{% unless forloop.last %},{% endunless %}
         {% endfor %}
       ];
+      
+      console.log('Option names:', optionNames);
+      console.log('Looking for variant with:', selectedOptions);
 
       const matchingVariant = variantData.find(variant => {
-        return variant.options.every((option, index) => {
+        console.log('Checking variant:', variant.id, 'options:', variant.options);
+        const matches = variant.options.every((option, index) => {
           const optionName = optionNames[index];
-          return selectedOptions[optionName] === option;
+          const isMatch = selectedOptions[optionName] === option;
+          console.log(`  ${optionName}: "${selectedOptions[optionName]}" === "${option}"?`, isMatch);
+          return isMatch;
         });
+        console.log('  Variant matches?', matches);
+        return matches;
       });
+      
+      console.log('Matching variant found:', matchingVariant);
 
       if (matchingVariant) {
         variantIdInput.value = matchingVariant.id;
