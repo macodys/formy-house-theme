@@ -766,6 +766,10 @@
     const variantInputs = document.querySelectorAll('.product-form__option-input');
     const variantIdInput = document.getElementById('ProductVariantId');
     
+    console.log('=== VARIANT INPUTS DEBUG ===');
+    console.log('Found variant inputs:', variantInputs.length);
+    console.log('Variant inputs:', variantInputs);
+    
     if (variantInputs.length > 0) {
       // Update all labels when any variant changes
       function updateVariantLabels() {
@@ -787,12 +791,21 @@
       // Update variant on page load to ensure image matches selected variant
       updateVariant();
       
-      variantInputs.forEach(input => {
+      console.log('=== ATTACHING EVENT LISTENERS ===');
+      variantInputs.forEach((input, index) => {
+        console.log(`Attaching listener to input ${index}:`, input);
         input.addEventListener('change', function() {
+          console.log('=== VARIANT CHANGED! ===');
+          console.log('Changed input:', this);
+          console.log('New value:', this.value);
+          console.log('Is checked:', this.checked);
           updateVariantLabels();
           updateVariant();
         });
       });
+      console.log('Event listeners attached to', variantInputs.length, 'inputs');
+    } else {
+      console.log('ERROR: No variant inputs found!');
     }
 
     let isInitialLoad = true;
