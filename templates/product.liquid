@@ -823,6 +823,12 @@
         {% endfor %}
       ];
       
+      // Debug: Log all variant data
+      console.log('=== ALL VARIANT DATA ===');
+      variantData.forEach(v => {
+        console.log(`Variant ${v.id}:`, v.options, 'Image:', v.featured_image || v.image || 'NO IMAGE');
+      });
+      
       // Product images array for fallback
       const productImages = [
         {% for image in product.images %}
@@ -892,73 +898,67 @@
         }
 
         // Update image when variant changes
+        console.log('=== UPDATING IMAGE ===');
+        console.log('mainImage element:', mainImage);
+        
         if (mainImage) {
           // Determine which image to show: variant featured_image > variant image > first product image
           let imageToShow = matchingVariant.featured_image || matchingVariant.image;
           
+          console.log('Variant featured_image:', matchingVariant.featured_image);
+          console.log('Variant image:', matchingVariant.image);
+          console.log('Image to show:', imageToShow);
+          
           // If no variant-specific image, use the first product image as fallback
           if (!imageToShow && productImages.length > 0) {
             imageToShow = productImages[0];
+            console.log('Using fallback image:', imageToShow);
           }
           
-          console.log('Image to show:', imageToShow);
-          console.log('Current image:', mainImage.src);
+          console.log('Current image src:', mainImage.src);
           
           if (imageToShow) {
-            // Normalize URLs for comparison (remove protocol and domain)
-            const normalizeUrl = (url) => {
-              try {
-                const urlObj = new URL(url, window.location.origin);
-                return urlObj.pathname + urlObj.search;
-              } catch {
-                return url;
-              }
-            };
+            // FORCE UPDATE - skip comparison for now
+            console.log('FORCING image update to:', imageToShow);
             
-            const currentImageNormalized = normalizeUrl(mainImage.src);
-            const newImageNormalized = normalizeUrl(imageToShow);
-            
-            console.log('Normalized current:', currentImageNormalized);
-            console.log('Normalized new:', newImageNormalized);
-            
-            // Only update if the image has actually changed
-            if (currentImageNormalized !== newImageNormalized || isInitialLoad) {
-              console.log('Updating image!');
-              // Add smooth fade transition (skip on initial load)
-              if (!isInitialLoad) {
-                mainImage.style.opacity = '0';
-                
-                setTimeout(() => {
-                  mainImage.src = imageToShow;
-                  mainImage.style.opacity = '1';
-                }, 200);
-              } else {
-                mainImage.src = imageToShow;
-                isInitialLoad = false;
-              }
+            // Add smooth fade transition (skip on initial load)
+            if (!isInitialLoad) {
+              mainImage.style.opacity = '0';
               
-              // Update thumbnail to match if it exists
-              const matchingThumbnail = document.querySelector(`[data-image-src="${imageToShow}"]`);
-              if (matchingThumbnail) {
-                thumbnails.forEach(t => t.classList.remove('active'));
-                matchingThumbnail.classList.add('active');
-              } else if (thumbnails.length > 0) {
-                // If exact match not found, activate first thumbnail
-                thumbnails.forEach(t => t.classList.remove('active'));
-                if (thumbnails[0]) {
-                  thumbnails[0].classList.add('active');
-                }
-              }
+              setTimeout(() => {
+                mainImage.src = imageToShow;
+                mainImage.style.opacity = '1';
+                console.log('Image updated! New src:', mainImage.src);
+              }, 200);
             } else {
-              console.log('Image unchanged, skipping update');
+              mainImage.src = imageToShow;
+              isInitialLoad = false;
+              console.log('Initial image set to:', mainImage.src);
+            }
+            
+            // Update thumbnail to match if it exists
+            const matchingThumbnail = document.querySelector(`[data-image-src="${imageToShow}"]`);
+            console.log('Matching thumbnail:', matchingThumbnail);
+            
+            if (matchingThumbnail) {
+              thumbnails.forEach(t => t.classList.remove('active'));
+              matchingThumbnail.classList.add('active');
+            } else if (thumbnails.length > 0) {
+              // If exact match not found, activate first thumbnail
+              thumbnails.forEach(t => t.classList.remove('active'));
+              if (thumbnails[0]) {
+                thumbnails[0].classList.add('active');
+              }
             }
           } else {
-            console.log('No image to show');
+            console.log('ERROR: No image to show');
           }
           
           if (isInitialLoad) {
             isInitialLoad = false;
           }
+        } else {
+          console.log('ERROR: mainImage element not found!');
         }
       }
     }
