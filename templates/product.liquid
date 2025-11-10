@@ -765,6 +765,7 @@
     // Variant selection
     const variantInputs = document.querySelectorAll('.product-form__option-input');
     const variantIdInput = document.getElementById('ProductVariantId');
+    let isInitialLoad = true;
     
     if (variantInputs.length > 0) {
       // Update all labels when any variant changes
@@ -797,8 +798,6 @@
         });
       });
     }
-
-    let isInitialLoad = true;
     
     function updateVariant() {
       const selectedOptions = {};
