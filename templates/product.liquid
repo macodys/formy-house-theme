@@ -773,8 +773,10 @@
           const label = input.nextElementSibling;
           if (label) {
             if (input.checked) {
+              console.log('Adding selected to:', input.value);
               label.classList.add('selected');
             } else {
+              console.log('Removing selected from:', input.value);
               label.classList.remove('selected');
             }
           }
@@ -789,6 +791,7 @@
       
       variantInputs.forEach(input => {
         input.addEventListener('change', function() {
+          console.log('Variant clicked:', this.value, 'Checked:', this.checked);
           updateVariantLabels();
           updateVariant();
         });
@@ -844,6 +847,7 @@
       });
 
       if (matchingVariant) {
+        console.log('Found variant:', matchingVariant.id, 'Image:', matchingVariant.featured_image || matchingVariant.image);
         variantIdInput.value = matchingVariant.id;
         
         // Update price using pre-formatted values
@@ -899,6 +903,7 @@
           }
           
           if (imageToShow) {
+            console.log('Updating image to:', imageToShow);
             // Add smooth fade transition (skip on initial load)
             if (!isInitialLoad) {
               mainImage.style.opacity = '0';
@@ -906,10 +911,12 @@
               setTimeout(() => {
                 mainImage.src = imageToShow;
                 mainImage.style.opacity = '1';
+                console.log('Image updated!');
               }, 200);
             } else {
               mainImage.src = imageToShow;
               isInitialLoad = false;
+              console.log('Initial image set');
             }
             
             // Update thumbnail to match if it exists
