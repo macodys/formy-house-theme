@@ -62,9 +62,9 @@
               <div class="product-form__variants">
                 {% for option in product.options_with_values %}
                   <div class="product-form__option">
-                    <label class="product-form__option-label" for="Option{{ forloop.index }}">
+                    <div class="product-form__option-label">
                       {{ option.name }}
-                    </label>
+                    </div>
                     <div class="product-form__option-values">
                       {% for value in option.values %}
                         <input 
