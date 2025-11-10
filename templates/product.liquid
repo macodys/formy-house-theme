@@ -846,6 +846,9 @@
       if (matchingVariant) {
         variantIdInput.value = matchingVariant.id;
         
+        // Debug: Log variant info
+        console.log('Selected variant:', matchingVariant.id, 'Image:', matchingVariant.featured_image || matchingVariant.image);
+        
         // Update price using pre-formatted values
         const priceElement = document.querySelector('.product-info__price-current');
         if (priceElement && matchingVariant.priceFormatted) {
@@ -898,33 +901,62 @@
             imageToShow = productImages[0];
           }
           
-          if (imageToShow && mainImage.src !== imageToShow) {
-            // Add smooth fade transition (skip on initial load)
-            if (!isInitialLoad) {
-              mainImage.style.opacity = '0';
-              
-              setTimeout(() => {
-                mainImage.src = imageToShow;
-                mainImage.style.opacity = '1';
-              }, 200);
-            } else {
-              mainImage.src = imageToShow;
-              isInitialLoad = false;
-            }
-            
-            // Update thumbnail to match if it exists
-            const matchingThumbnail = document.querySelector(`[data-image-src="${imageToShow}"]`);
-            if (matchingThumbnail) {
-              thumbnails.forEach(t => t.classList.remove('active'));
-              matchingThumbnail.classList.add('active');
-            } else if (thumbnails.length > 0) {
-              // If exact match not found, activate first thumbnail
-              thumbnails.forEach(t => t.classList.remove('active'));
-              if (thumbnails[0]) {
-                thumbnails[0].classList.add('active');
+          console.log('Image to show:', imageToShow);
+          console.log('Current image:', mainImage.src);
+          
+          if (imageToShow) {
+            // Normalize URLs for comparison (remove protocol and domain)
+            const normalizeUrl = (url) => {
+              try {
+                const urlObj = new URL(url, window.location.origin);
+                return urlObj.pathname + urlObj.search;
+              } catch {
+                return url;
               }
+            };
+            
+            const currentImageNormalized = normalizeUrl(mainImage.src);
+            const newImageNormalized = normalizeUrl(imageToShow);
+            
+            console.log('Normalized current:', currentImageNormalized);
+            console.log('Normalized new:', newImageNormalized);
+            
+            // Only update if the image has actually changed
+            if (currentImageNormalized !== newImageNormalized || isInitialLoad) {
+              console.log('Updating image!');
+              // Add smooth fade transition (skip on initial load)
+              if (!isInitialLoad) {
+                mainImage.style.opacity = '0';
+                
+                setTimeout(() => {
+                  mainImage.src = imageToShow;
+                  mainImage.style.opacity = '1';
+                }, 200);
+              } else {
+                mainImage.src = imageToShow;
+                isInitialLoad = false;
+              }
+              
+              // Update thumbnail to match if it exists
+              const matchingThumbnail = document.querySelector(`[data-image-src="${imageToShow}"]`);
+              if (matchingThumbnail) {
+                thumbnails.forEach(t => t.classList.remove('active'));
+                matchingThumbnail.classList.add('active');
+              } else if (thumbnails.length > 0) {
+                // If exact match not found, activate first thumbnail
+                thumbnails.forEach(t => t.classList.remove('active'));
+                if (thumbnails[0]) {
+                  thumbnails[0].classList.add('active');
+                }
+              }
+            } else {
+              console.log('Image unchanged, skipping update');
             }
           } else {
+            console.log('No image to show');
+          }
+          
+          if (isInitialLoad) {
             isInitialLoad = false;
           }
         }
