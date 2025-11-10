@@ -853,7 +853,7 @@
       ];
 
       const optionNames = [
-        {% for option in product.options %}
+        {% for option in product.options_with_values %}
         '{{ option.name }}'{% unless forloop.last %},{% endunless %}
         {% endfor %}
       ];
