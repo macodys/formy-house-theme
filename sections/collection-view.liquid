@@ -174,10 +174,12 @@
     overflow: clip;
     position: relative;
     font-family: var(--font-body-family);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, height 0.3s ease;
   }
 
-  .product-card-link:hover .product-card {
+  .product-card-link:hover .product-card,
+  .product-card-link:focus-within .product-card {
+    height: 38rem;
     transform: translateY(-5px);
   }
 
@@ -192,7 +194,7 @@
     backdrop-filter: blur(1rem);
     border-radius: 0 0 1.5rem 1.5rem;
     translate: 0 0;
-    transition: translate 0.25s;
+    transition: translate 0.25s, height 0.3s ease;
     z-index: 1;
   }
 
