@@ -766,10 +766,6 @@
     const variantInputs = document.querySelectorAll('.product-form__option-input');
     const variantIdInput = document.getElementById('ProductVariantId');
     
-    console.log('=== VARIANT INPUTS DEBUG ===');
-    console.log('Found variant inputs:', variantInputs.length);
-    console.log('Variant inputs:', variantInputs);
-    
     if (variantInputs.length > 0) {
       // Update all labels when any variant changes
       function updateVariantLabels() {
@@ -791,36 +787,24 @@
       // Update variant on page load to ensure image matches selected variant
       updateVariant();
       
-      console.log('=== ATTACHING EVENT LISTENERS ===');
-      variantInputs.forEach((input, index) => {
-        console.log(`Attaching listener to input ${index}:`, input);
+      variantInputs.forEach(input => {
         input.addEventListener('change', function() {
-          console.log('=== VARIANT CHANGED! ===');
-          console.log('Changed input:', this);
-          console.log('New value:', this.value);
-          console.log('Is checked:', this.checked);
           updateVariantLabels();
           updateVariant();
         });
       });
-      console.log('Event listeners attached to', variantInputs.length, 'inputs');
-    } else {
-      console.log('ERROR: No variant inputs found!');
     }
 
     let isInitialLoad = true;
     
     function updateVariant() {
-      console.log('=== UPDATE VARIANT CALLED ===');
       const selectedOptions = {};
       variantInputs.forEach(input => {
         if (input.checked) {
           const optionName = input.name.match(/\[(.*?)\]/)[1];
           selectedOptions[optionName] = input.value;
-          console.log('Selected option:', optionName, '=', input.value);
         }
       });
-      console.log('All selected options:', selectedOptions);
 
       // Find matching variant using variant data
       const variantData = [
@@ -839,12 +823,6 @@
         {% endfor %}
       ];
       
-      // Debug: Log all variant data
-      console.log('=== ALL VARIANT DATA ===');
-      variantData.forEach(v => {
-        console.log(`Variant ${v.id}:`, v.options, 'Image:', v.featured_image || v.image || 'NO IMAGE');
-      });
-      
       // Product images array for fallback
       const productImages = [
         {% for image in product.images %}
@@ -857,29 +835,16 @@
         '{{ option.name }}'{% unless forloop.last %},{% endunless %}
         {% endfor %}
       ];
-      
-      console.log('Option names:', optionNames);
-      console.log('Looking for variant with:', selectedOptions);
 
       const matchingVariant = variantData.find(variant => {
-        console.log('Checking variant:', variant.id, 'options:', variant.options);
-        const matches = variant.options.every((option, index) => {
+        return variant.options.every((option, index) => {
           const optionName = optionNames[index];
-          const isMatch = selectedOptions[optionName] === option;
-          console.log(`  ${optionName}: "${selectedOptions[optionName]}" === "${option}"?`, isMatch);
-          return isMatch;
+          return selectedOptions[optionName] === option;
         });
-        console.log('  Variant matches?', matches);
-        return matches;
       });
-      
-      console.log('Matching variant found:', matchingVariant);
 
       if (matchingVariant) {
         variantIdInput.value = matchingVariant.id;
-        
-        // Debug: Log variant info
-        console.log('Selected variant:', matchingVariant.id, 'Image:', matchingVariant.featured_image || matchingVariant.image);
         
         // Update price using pre-formatted values
         const priceElement = document.querySelector('.product-info__price-current');
@@ -924,29 +889,16 @@
         }
 
         // Update image when variant changes
-        console.log('=== UPDATING IMAGE ===');
-        console.log('mainImage element:', mainImage);
-        
         if (mainImage) {
           // Determine which image to show: variant featured_image > variant image > first product image
           let imageToShow = matchingVariant.featured_image || matchingVariant.image;
           
-          console.log('Variant featured_image:', matchingVariant.featured_image);
-          console.log('Variant image:', matchingVariant.image);
-          console.log('Image to show:', imageToShow);
-          
           // If no variant-specific image, use the first product image as fallback
           if (!imageToShow && productImages.length > 0) {
             imageToShow = productImages[0];
-            console.log('Using fallback image:', imageToShow);
           }
           
-          console.log('Current image src:', mainImage.src);
-          
           if (imageToShow) {
-            // FORCE UPDATE - skip comparison for now
-            console.log('FORCING image update to:', imageToShow);
-            
             // Add smooth fade transition (skip on initial load)
             if (!isInitialLoad) {
               mainImage.style.opacity = '0';
@@ -954,18 +906,14 @@
               setTimeout(() => {
                 mainImage.src = imageToShow;
                 mainImage.style.opacity = '1';
-                console.log('Image updated! New src:', mainImage.src);
               }, 200);
             } else {
               mainImage.src = imageToShow;
               isInitialLoad = false;
-              console.log('Initial image set to:', mainImage.src);
             }
             
             // Update thumbnail to match if it exists
             const matchingThumbnail = document.querySelector(`[data-image-src="${imageToShow}"]`);
-            console.log('Matching thumbnail:', matchingThumbnail);
-            
             if (matchingThumbnail) {
               thumbnails.forEach(t => t.classList.remove('active'));
               matchingThumbnail.classList.add('active');
@@ -976,15 +924,11 @@
                 thumbnails[0].classList.add('active');
               }
             }
-          } else {
-            console.log('ERROR: No image to show');
           }
           
           if (isInitialLoad) {
             isInitialLoad = false;
           }
-        } else {
-          console.log('ERROR: mainImage element not found!');
         }
       }
     }
