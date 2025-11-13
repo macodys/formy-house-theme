@@ -536,15 +536,15 @@
             button.textContent = 'Added!';
             button.style.background = '#4caf50';
             
-            // Reload cart count
-            fetch('/cart.js')
-              .then(response => response.json())
-              .then(cart => {
-                const cartCount = document.querySelector('.header__cart-count');
-                if (cartCount) {
-                  cartCount.textContent = cart.item_count;
-                }
-              });
+            // Trigger cart drawer update
+            window.dispatchEvent(new Event('cart:updated'));
+            
+            // Open cart drawer
+            const cartDrawer = document.getElementById('cart-drawer');
+            if (cartDrawer) {
+              cartDrawer.classList.add('active');
+              document.body.style.overflow = 'hidden';
+            }
             
             setTimeout(() => {
               button.textContent = originalText;

@@ -36,14 +36,12 @@
         </button>
       </form>
       
-      <a href="{{ routes.cart_url }}" class="header__cart" aria-label="Shopping cart">
+      <button type="button" class="header__cart" aria-label="Shopping cart" id="cart-icon-button">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
           <path d="M7 4V2C7 1.44772 7.44772 1 8 1H12C12.5523 1 13 1.44772 13 2V4M7 4H5C3.89543 4 3 4.89543 3 6V16C3 17.1046 3.89543 18 5 18H15C16.1046 18 17 17.1046 17 16V6C17 4.89543 16.1046 4 15 4H13M7 4H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        {% if cart.item_count > 0 %}
-          <span class="header__cart-count">{{ cart.item_count }}</span>
-        {% endif %}
-      </a>
+        <span class="header__cart-count" id="cart-count-bubble" style="display: {% if cart.item_count > 0 %}flex{% else %}none{% endif %};">{{ cart.item_count }}</span>
+      </button>
       
       <button class="header__menu-toggle" aria-label="Toggle menu" aria-expanded="false">
         <span></span>
@@ -172,6 +170,9 @@
     align-items: center;
     justify-content: center;
     transition: color 0.3s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
   }
 
   .header__cart:hover {

@@ -723,6 +723,61 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Handle add to cart form submission
+    const productForm = document.getElementById('ProductForm');
+    if (productForm) {
+      productForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const variantId = formData.get('id');
+        const quantity = formData.get('quantity');
+        
+        try {
+          const response = await fetch('/cart/add.js', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              items: [{
+                id: parseInt(variantId),
+                quantity: parseInt(quantity)
+              }]
+            })
+          });
+          
+          if (response.ok) {
+            // Trigger cart drawer update
+            window.dispatchEvent(new Event('cart:updated'));
+            
+            // Open cart drawer
+            const cartDrawer = document.getElementById('cart-drawer');
+            if (cartDrawer) {
+              cartDrawer.classList.add('active');
+              document.body.style.overflow = 'hidden';
+            }
+            
+            // Visual feedback on button
+            const submitBtn = this.querySelector('.product-form__submit');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Added to Cart!';
+            submitBtn.style.background = '#4caf50';
+            
+            setTimeout(() => {
+              submitBtn.textContent = originalText;
+              submitBtn.style.background = '';
+            }, 2000);
+          } else {
+            alert('Could not add item to cart. Please try again.');
+          }
+        } catch (error) {
+          console.error('Error adding to cart:', error);
+          alert('Could not add item to cart. Please try again.');
+        }
+      });
+    }
+    
     // Image gallery functionality
     const thumbnails = document.querySelectorAll('.product-gallery__thumbnail');
     const mainImage = document.getElementById('ProductImage');
