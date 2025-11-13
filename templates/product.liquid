@@ -840,7 +840,10 @@
       {% for variant in product.variants %}
       {
         id: {{ variant.id }},
-        available: {{ variant.available | json }}
+        available: {{ variant.available | json }},
+        inventory_quantity: {{ variant.inventory_quantity | default: 0 }},
+        inventory_management: '{{ variant.inventory_management }}',
+        inventory_policy: '{{ variant.inventory_policy }}'
       }{% unless forloop.last %},{% endunless %}
       {% endfor %}
     ];
@@ -852,8 +855,19 @@
     if (currentVariantId && submitBtn) {
       const currentVariant = variantData.find(v => v.id === currentVariantId);
       
-      // Default to available if no variant data found (safer)
-      const isAvailable = currentVariant ? currentVariant.available : true;
+      // Check inventory quantity instead of just 'available' flag
+      let isAvailable = true; // Default to available
+      
+      if (currentVariant) {
+        // If inventory is tracked, check quantity
+        if (currentVariant.inventory_management === 'shopify') {
+          // Check if we have inventory OR if we allow continue selling when out of stock
+          isAvailable = currentVariant.inventory_quantity > 0 || currentVariant.inventory_policy === 'continue';
+        } else {
+          // Inventory not tracked, always available
+          isAvailable = true;
+        }
+      }
       
       if (isAvailable) {
         submitBtn.disabled = false;
@@ -867,7 +881,11 @@
       
       console.log('Product button initialized:', {
         variantId: currentVariantId,
-        available: isAvailable,
+        shopifyAvailable: currentVariant ? currentVariant.available : 'N/A',
+        inventoryQuantity: currentVariant ? currentVariant.inventory_quantity : 'N/A',
+        inventoryManagement: currentVariant ? currentVariant.inventory_management : 'N/A',
+        inventoryPolicy: currentVariant ? currentVariant.inventory_policy : 'N/A',
+        calculatedAvailable: isAvailable,
         buttonText: submitBtn.textContent
       });
     }
@@ -922,6 +940,9 @@
           compare_at_price: {{ variant.compare_at_price | default: 0 }},
           compare_at_priceFormatted: {% if variant.compare_at_price %}'{{ variant.compare_at_price | money }}'{% else %}null{% endif %},
           available: {{ variant.available | json }},
+          inventory_quantity: {{ variant.inventory_quantity | default: 0 }},
+          inventory_management: '{{ variant.inventory_management }}',
+          inventory_policy: '{{ variant.inventory_policy }}',
           options: {{ variant.options | json }},
           featured_image: {% if variant.featured_image %}'{{ variant.featured_image | image_url: width: 1200 }}'{% else %}null{% endif %},
           image: {% if variant.image %}'{{ variant.image | image_url: width: 1200 }}'{% else %}null{% endif %}
@@ -985,12 +1006,27 @@
         // Update availability
         const submitBtn = document.getElementById('product-submit-button');
         if (submitBtn) {
+          // Check inventory quantity instead of just 'available' flag
+          let isAvailable = true;
+          
+          if (matchingVariant.inventory_management === 'shopify') {
+            // Check if we have inventory OR if we allow continue selling when out of stock
+            isAvailable = matchingVariant.inventory_quantity > 0 || matchingVariant.inventory_policy === 'continue';
+          } else {
+            // Inventory not tracked, always available
+            isAvailable = true;
+          }
+          
           console.log('Updating button for variant:', {
             variantId: matchingVariant.id,
-            available: matchingVariant.available
+            shopifyAvailable: matchingVariant.available,
+            inventoryQuantity: matchingVariant.inventory_quantity,
+            inventoryManagement: matchingVariant.inventory_management,
+            inventoryPolicy: matchingVariant.inventory_policy,
+            calculatedAvailable: isAvailable
           });
           
-          if (matchingVariant.available) {
+          if (isAvailable) {
             submitBtn.disabled = false;
             submitBtn.textContent = 'ADD TO CART';
             submitBtn.style.opacity = '1';
