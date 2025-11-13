@@ -111,13 +111,9 @@
             type="submit" 
             name="add" 
             class="product-form__submit"
-            {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
+            id="product-submit-button"
           >
-            {% if product.selected_or_first_available_variant.available %}
-              Add to Cart
-            {% else %}
-              Sold Out
-            {% endif %}
+            Add to Cart
           </button>
         </form>
         
@@ -836,7 +832,24 @@
     // Variant selection
     const variantInputs = document.querySelectorAll('.product-form__option-input');
     const variantIdInput = document.getElementById('ProductVariantId');
+    const submitBtn = document.getElementById('product-submit-button');
     let isInitialLoad = true;
+    
+    // For products with no variants, ensure button shows correct state
+    if (variantInputs.length === 0) {
+      const productAvailable = {{ product.selected_or_first_available_variant.available | json }};
+      if (submitBtn) {
+        if (productAvailable) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'ADD TO CART';
+          submitBtn.style.opacity = '1';
+        } else {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'SOLD OUT';
+          submitBtn.style.opacity = '0.5';
+        }
+      }
+    }
     
     if (variantInputs.length > 0) {
       // Update all labels when any variant changes
@@ -856,8 +869,10 @@
       // Set initial state
       updateVariantLabels();
       
-      // Update variant on page load to ensure image matches selected variant
-      updateVariant();
+      // Update variant on page load to ensure everything is in sync
+      setTimeout(() => {
+        updateVariant();
+      }, 100);
       
       variantInputs.forEach(input => {
         input.addEventListener('change', function() {
@@ -947,14 +962,16 @@
         }
 
         // Update availability
-        const submitBtn = document.querySelector('.product-form__submit');
+        const submitBtn = document.getElementById('product-submit-button');
         if (submitBtn) {
           if (matchingVariant.available) {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Add to Cart';
+            submitBtn.textContent = 'ADD TO CART';
+            submitBtn.style.opacity = '1';
           } else {
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Sold Out';
+            submitBtn.textContent = 'SOLD OUT';
+            submitBtn.style.opacity = '0.5';
           }
         }
 
