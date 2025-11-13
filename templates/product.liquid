@@ -746,20 +746,26 @@
         const quantity = formData.get('quantity');
         
         try {
+          console.log('Adding to cart:', {
+            variantId: variantId,
+            quantity: quantity
+          });
+          
           const response = await fetch('/cart/add.js', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              items: [{
-                id: parseInt(variantId),
-                quantity: parseInt(quantity)
-              }]
+              id: variantId,
+              quantity: parseInt(quantity)
             })
           });
           
           if (response.ok) {
+            const data = await response.json();
+            console.log('Added to cart successfully:', data);
+            
             // Trigger cart drawer update
             window.dispatchEvent(new Event('cart:updated'));
             
@@ -781,7 +787,12 @@
               submitBtn.style.background = '';
             }, 2000);
           } else {
-            alert('Could not add item to cart. Please try again.');
+            const errorData = await response.json();
+            console.error('Cart add failed:', {
+              status: response.status,
+              error: errorData
+            });
+            alert('Could not add item to cart. Please try again.\n\nError: ' + (errorData.description || errorData.message || 'Unknown error'));
           }
         } catch (error) {
           console.error('Error adding to cart:', error);
