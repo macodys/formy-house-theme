@@ -835,20 +835,41 @@
     const submitBtn = document.getElementById('product-submit-button');
     let isInitialLoad = true;
     
-    // For products with no variants, ensure button shows correct state
-    if (variantInputs.length === 0) {
-      const productAvailable = {{ product.selected_or_first_available_variant.available | json }};
-      if (submitBtn) {
-        if (productAvailable) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'ADD TO CART';
-          submitBtn.style.opacity = '1';
-        } else {
-          submitBtn.disabled = true;
-          submitBtn.textContent = 'SOLD OUT';
-          submitBtn.style.opacity = '0.5';
-        }
+    // Check inventory for all products (including single-variant)
+    const variantData = [
+      {% for variant in product.variants %}
+      {
+        id: {{ variant.id }},
+        available: {{ variant.available | json }}
+      }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ];
+    
+    // Get current variant ID
+    const currentVariantId = variantIdInput ? parseInt(variantIdInput.value) : null;
+    
+    // Find current variant and set button state
+    if (currentVariantId && submitBtn) {
+      const currentVariant = variantData.find(v => v.id === currentVariantId);
+      
+      // Default to available if no variant data found (safer)
+      const isAvailable = currentVariant ? currentVariant.available : true;
+      
+      if (isAvailable) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'ADD TO CART';
+        submitBtn.style.opacity = '1';
+      } else {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'SOLD OUT';
+        submitBtn.style.opacity = '0.5';
       }
+      
+      console.log('Product button initialized:', {
+        variantId: currentVariantId,
+        available: isAvailable,
+        buttonText: submitBtn.textContent
+      });
     }
     
     if (variantInputs.length > 0) {
@@ -964,6 +985,11 @@
         // Update availability
         const submitBtn = document.getElementById('product-submit-button');
         if (submitBtn) {
+          console.log('Updating button for variant:', {
+            variantId: matchingVariant.id,
+            available: matchingVariant.available
+          });
+          
           if (matchingVariant.available) {
             submitBtn.disabled = false;
             submitBtn.textContent = 'ADD TO CART';
