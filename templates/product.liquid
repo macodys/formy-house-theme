@@ -869,7 +869,32 @@
     if (currentVariantId && submitBtn) {
       const currentVariant = variantData.find(v => v.id === currentVariantId);
       
-      // Check inventory - show sold out only if truly unavailable
+      // Check inventory across all locations via Shopify API
+      async function checkVariantAvailability(variantId) {
+        try {
+          // Get product data from Shopify API (checks all locations)
+          const productHandle = '{{ product.handle }}';
+          const response = await fetch(`/products/${productHandle}.js`);
+          const productData = await response.json();
+          
+          // Find the variant in the product data
+          const variant = productData.variants.find(v => v.id === variantId);
+          
+          if (variant) {
+            // variant.available checks inventory across ALL locations
+            return variant.available;
+          }
+          
+          // If variant not found, default to available
+          return true;
+        } catch (error) {
+          console.error('Error checking availability:', error);
+          // Default to available if check fails
+          return true;
+        }
+      }
+      
+      // Initial check using Liquid data
       let isAvailable = true; // Default to available
       
       if (currentVariant) {
@@ -883,6 +908,28 @@
         }
       }
       
+      // Double-check via API for all locations
+      if (currentVariantId) {
+        checkVariantAvailability(currentVariantId).then(apiAvailable => {
+          if (apiAvailable !== isAvailable) {
+            // API says different - update button
+            isAvailable = apiAvailable;
+            if (submitBtn) {
+              if (isAvailable) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'ADD TO CART';
+                submitBtn.style.opacity = '1';
+              } else {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'SOLD OUT';
+                submitBtn.style.opacity = '1';
+              }
+            }
+          }
+        });
+      }
+      
+      // Set initial state
       if (isAvailable) {
         submitBtn.disabled = false;
         submitBtn.textContent = 'ADD TO CART';
@@ -898,7 +945,8 @@
         inventoryQuantity: currentVariant ? currentVariant.inventory_quantity : 'N/A',
         inventoryPolicy: currentVariant ? currentVariant.inventory_policy : 'N/A',
         calculatedAvailable: isAvailable,
-        buttonText: submitBtn.textContent
+        buttonText: submitBtn.textContent,
+        note: 'Checking all locations via API...'
       });
     }
     
@@ -1015,10 +1063,10 @@
           if (priceSave) priceSave.style.display = 'none';
         }
 
-        // Update availability
+        // Update availability - check all locations
         const submitBtn = document.getElementById('product-submit-button');
         if (submitBtn) {
-          // Check inventory - show sold out only if truly unavailable
+          // Initial check using variant data
           let isAvailable = true; // Default to available
           
           const isTracked = matchingVariant.inventory_management && matchingVariant.inventory_management !== '';
@@ -1030,13 +1078,43 @@
             isAvailable = false;
           }
           
+          // Double-check via API for all locations
+          (async function() {
+            try {
+              const productHandle = '{{ product.handle }}';
+              const response = await fetch(`/products/${productHandle}.js`);
+              const productData = await response.json();
+              const variant = productData.variants.find(v => v.id === matchingVariant.id);
+              
+              if (variant && variant.available !== isAvailable) {
+                // API says different - update button
+                isAvailable = variant.available;
+                if (submitBtn) {
+                  if (isAvailable) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'ADD TO CART';
+                    submitBtn.style.opacity = '1';
+                  } else {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'SOLD OUT';
+                    submitBtn.style.opacity = '1';
+                  }
+                }
+              }
+            } catch (error) {
+              console.error('Error checking availability:', error);
+            }
+          })();
+          
           console.log('Updating button for variant:', {
             variantId: matchingVariant.id,
             inventoryQuantity: matchingVariant.inventory_quantity,
             inventoryPolicy: matchingVariant.inventory_policy,
-            calculatedAvailable: isAvailable
+            calculatedAvailable: isAvailable,
+            note: 'Checking all locations via API...'
           });
           
+          // Set initial state
           if (isAvailable) {
             submitBtn.disabled = false;
             submitBtn.textContent = 'ADD TO CART';
