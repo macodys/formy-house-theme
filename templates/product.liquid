@@ -869,72 +869,25 @@
     if (currentVariantId && submitBtn) {
       const currentVariant = variantData.find(v => v.id === currentVariantId);
       
-      // Check inventory across all locations via Shopify API
-      async function checkVariantAvailability(variantId) {
-        try {
-          // Get product data from Shopify API (checks all locations)
-          const productHandle = '{{ product.handle }}';
-          const response = await fetch(`/products/${productHandle}.js`);
-          const productData = await response.json();
-          
-          // Find the variant in the product data
-          const variant = productData.variants.find(v => v.id === variantId);
-          
-          if (variant) {
-            // variant.available checks inventory across ALL locations
-            return variant.available;
-          }
-          
-          // If variant not found, default to available
-          return true;
-        } catch (error) {
-          console.error('Error checking availability:', error);
-          // Default to available if check fails
-          return true;
-        }
-      }
+      // For AutoDS products: Always show ADD TO CART
+      // AutoDS manages inventory externally, so inventory_quantity may be 0
+      // but product is still available. Let Shopify handle validation at checkout.
+      let isAvailable = true; // Always default to available for AutoDS compatibility
       
-      // For AutoDS products, trust API availability check (inventory_quantity may be 0)
-      // Initial check using Liquid data
-      let isAvailable = true; // Default to available
-      let useApiCheck = true; // Always use API check for accurate availability
-      
+      // Only show sold out if explicitly marked as unavailable in Shopify
+      // (This handles non-AutoDS products that are truly sold out)
       if (currentVariant) {
-        const isTracked = currentVariant.inventory_management && currentVariant.inventory_management !== '';
-        const hasQuantity = (currentVariant.inventory_quantity || 0) > 0;
-        const canContinue = currentVariant.inventory_policy === 'continue';
+        // Check if product is explicitly unavailable (very rare case)
+        // For AutoDS, this will almost always be true (available)
+        const isExplicitlyUnavailable = currentVariant.inventory_management === 'shopify' && 
+                                       (currentVariant.inventory_quantity || 0) === 0 && 
+                                       currentVariant.inventory_policy !== 'continue';
         
-        // For AutoDS: inventory_quantity might be 0 but product is still available
-        // So we rely on API check instead of Liquid inventory_quantity
-        // Only show sold out initially if: tracked, no quantity, AND can't continue selling
-        // But we'll override with API check
-        if (isTracked && !hasQuantity && !canContinue) {
+        // Only mark as sold out if explicitly unavailable AND not an AutoDS product
+        // (AutoDS products typically have inventory_policy = 'continue' or inventory not tracked)
+        if (isExplicitlyUnavailable) {
           isAvailable = false;
         }
-      }
-      
-      // Always check via API for all locations (especially important for AutoDS)
-      if (currentVariantId) {
-        checkVariantAvailability(currentVariantId).then(apiAvailable => {
-          // API is the source of truth - always use it
-          isAvailable = apiAvailable;
-          if (submitBtn) {
-            if (isAvailable) {
-              submitBtn.disabled = false;
-              submitBtn.textContent = 'ADD TO CART';
-              submitBtn.style.opacity = '1';
-            } else {
-              submitBtn.disabled = true;
-              submitBtn.textContent = 'SOLD OUT';
-              submitBtn.style.opacity = '1';
-            }
-          }
-          console.log('API availability check complete:', {
-            variantId: currentVariantId,
-            apiAvailable: apiAvailable,
-            buttonText: submitBtn.textContent
-          });
-        });
       }
       
       // Set initial state
@@ -954,7 +907,7 @@
         inventoryPolicy: currentVariant ? currentVariant.inventory_policy : 'N/A',
         calculatedAvailable: isAvailable,
         buttonText: submitBtn.textContent,
-        note: 'Checking all locations via API...'
+        note: 'AutoDS compatible - defaults to available'
       });
     }
     
@@ -1071,61 +1024,28 @@
           if (priceSave) priceSave.style.display = 'none';
         }
 
-        // Update availability - check all locations (especially for AutoDS)
+        // Update availability - simplified for AutoDS compatibility
         const submitBtn = document.getElementById('product-submit-button');
         if (submitBtn) {
-          // Initial check using variant data
-          let isAvailable = true; // Default to available
+          // For AutoDS: Always default to available
+          // AutoDS manages inventory externally, inventory_quantity may be 0 but still available
+          let isAvailable = true;
           
-          const isTracked = matchingVariant.inventory_management && matchingVariant.inventory_management !== '';
-          const hasQuantity = (matchingVariant.inventory_quantity || 0) > 0;
-          const canContinue = matchingVariant.inventory_policy === 'continue';
+          // Only show sold out if explicitly unavailable (very strict check)
+          const isExplicitlyUnavailable = matchingVariant.inventory_management === 'shopify' && 
+                                         (matchingVariant.inventory_quantity || 0) === 0 && 
+                                         matchingVariant.inventory_policy !== 'continue';
           
-          // For AutoDS: inventory_quantity might be 0 but product is still available
-          // Only show sold out initially if: tracked, no quantity, AND can't continue selling
-          if (isTracked && !hasQuantity && !canContinue) {
+          if (isExplicitlyUnavailable) {
             isAvailable = false;
           }
-          
-          // Always check via API (API is source of truth for AutoDS)
-          (async function() {
-            try {
-              const productHandle = '{{ product.handle }}';
-              const response = await fetch(`/products/${productHandle}.js`);
-              const productData = await response.json();
-              const variant = productData.variants.find(v => v.id === matchingVariant.id);
-              
-              if (variant) {
-                // API is the source of truth - always use it
-                isAvailable = variant.available;
-                if (submitBtn) {
-                  if (isAvailable) {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'ADD TO CART';
-                    submitBtn.style.opacity = '1';
-                  } else {
-                    submitBtn.disabled = true;
-                    submitBtn.textContent = 'SOLD OUT';
-                    submitBtn.style.opacity = '1';
-                  }
-                }
-                console.log('Variant availability updated from API:', {
-                  variantId: matchingVariant.id,
-                  apiAvailable: variant.available,
-                  buttonText: submitBtn.textContent
-                });
-              }
-            } catch (error) {
-              console.error('Error checking availability:', error);
-            }
-          })();
           
           console.log('Updating button for variant:', {
             variantId: matchingVariant.id,
             inventoryQuantity: matchingVariant.inventory_quantity,
             inventoryPolicy: matchingVariant.inventory_policy,
             calculatedAvailable: isAvailable,
-            note: 'Checking all locations via API...'
+            note: 'AutoDS compatible - defaults to available'
           });
           
           // Set initial state
