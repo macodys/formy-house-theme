@@ -866,26 +866,9 @@
     if (currentVariantId && submitBtn) {
       const currentVariant = variantData.find(v => v.id === currentVariantId);
       
-      // Check inventory - default to available unless explicitly sold out
-      let isAvailable = true; // Default to available (safer)
-      
-      if (currentVariant) {
-        // Only mark as sold out if:
-        // 1. Inventory is tracked by Shopify
-        // 2. Quantity is 0 or less
-        // 3. AND policy is 'deny' (don't continue selling)
-        const isTracked = currentVariant.inventory_management && currentVariant.inventory_management !== '';
-        const hasQuantity = (currentVariant.inventory_quantity || 0) > 0;
-        const canContinue = currentVariant.inventory_policy === 'continue';
-        
-        // Only show sold out if tracked, no quantity, and can't continue
-        if (isTracked && !hasQuantity && !canContinue) {
-          isAvailable = false;
-        } else {
-          // In all other cases, show as available
-          isAvailable = true;
-        }
-      }
+      // Always show as available - let Shopify handle inventory at checkout
+      // This prevents false "sold out" messages due to location/inventory sync issues
+      let isAvailable = true;
       
       if (isAvailable) {
         submitBtn.disabled = false;
@@ -899,12 +882,9 @@
       
       console.log('Product button initialized:', {
         variantId: currentVariantId,
-        shopifyAvailable: currentVariant ? currentVariant.available : 'N/A',
-        inventoryQuantity: currentVariant ? currentVariant.inventory_quantity : 'N/A',
-        inventoryManagement: currentVariant ? currentVariant.inventory_management : 'N/A',
-        inventoryPolicy: currentVariant ? currentVariant.inventory_policy : 'N/A',
-        calculatedAvailable: isAvailable,
-        buttonText: submitBtn.textContent
+        alwaysAvailable: true,
+        buttonText: submitBtn.textContent,
+        note: 'Button always shows ADD TO CART - Shopify handles inventory at checkout'
       });
     }
     
@@ -1024,32 +1004,14 @@
         // Update availability
         const submitBtn = document.getElementById('product-submit-button');
         if (submitBtn) {
-          // Check inventory - default to available unless explicitly sold out
-          let isAvailable = true; // Default to available (safer)
-          
-          // Only mark as sold out if:
-          // 1. Inventory is tracked by Shopify
-          // 2. Quantity is 0 or less
-          // 3. AND policy is 'deny' (don't continue selling)
-          const isTracked = matchingVariant.inventory_management && matchingVariant.inventory_management !== '';
-          const hasQuantity = (matchingVariant.inventory_quantity || 0) > 0;
-          const canContinue = matchingVariant.inventory_policy === 'continue';
-          
-          // Only show sold out if tracked, no quantity, and can't continue
-          if (isTracked && !hasQuantity && !canContinue) {
-            isAvailable = false;
-          } else {
-            // In all other cases, show as available
-            isAvailable = true;
-          }
+          // Always show as available - let Shopify handle inventory at checkout
+          // This prevents false "sold out" messages due to location/inventory sync issues
+          let isAvailable = true;
           
           console.log('Updating button for variant:', {
             variantId: matchingVariant.id,
-            shopifyAvailable: matchingVariant.available,
-            inventoryQuantity: matchingVariant.inventory_quantity,
-            inventoryManagement: matchingVariant.inventory_management,
-            inventoryPolicy: matchingVariant.inventory_policy,
-            calculatedAvailable: isAvailable
+            alwaysAvailable: true,
+            note: 'Button always shows ADD TO CART - Shopify handles inventory at checkout'
           });
           
           if (isAvailable) {
