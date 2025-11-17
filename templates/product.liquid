@@ -894,38 +894,46 @@
         }
       }
       
+      // For AutoDS products, trust API availability check (inventory_quantity may be 0)
       // Initial check using Liquid data
       let isAvailable = true; // Default to available
+      let useApiCheck = true; // Always use API check for accurate availability
       
       if (currentVariant) {
         const isTracked = currentVariant.inventory_management && currentVariant.inventory_management !== '';
         const hasQuantity = (currentVariant.inventory_quantity || 0) > 0;
         const canContinue = currentVariant.inventory_policy === 'continue';
         
-        // Only show sold out if: tracked, no quantity, AND can't continue selling
+        // For AutoDS: inventory_quantity might be 0 but product is still available
+        // So we rely on API check instead of Liquid inventory_quantity
+        // Only show sold out initially if: tracked, no quantity, AND can't continue selling
+        // But we'll override with API check
         if (isTracked && !hasQuantity && !canContinue) {
           isAvailable = false;
         }
       }
       
-      // Double-check via API for all locations
+      // Always check via API for all locations (especially important for AutoDS)
       if (currentVariantId) {
         checkVariantAvailability(currentVariantId).then(apiAvailable => {
-          if (apiAvailable !== isAvailable) {
-            // API says different - update button
-            isAvailable = apiAvailable;
-            if (submitBtn) {
-              if (isAvailable) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'ADD TO CART';
-                submitBtn.style.opacity = '1';
-              } else {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'SOLD OUT';
-                submitBtn.style.opacity = '1';
-              }
+          // API is the source of truth - always use it
+          isAvailable = apiAvailable;
+          if (submitBtn) {
+            if (isAvailable) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'ADD TO CART';
+              submitBtn.style.opacity = '1';
+            } else {
+              submitBtn.disabled = true;
+              submitBtn.textContent = 'SOLD OUT';
+              submitBtn.style.opacity = '1';
             }
           }
+          console.log('API availability check complete:', {
+            variantId: currentVariantId,
+            apiAvailable: apiAvailable,
+            buttonText: submitBtn.textContent
+          });
         });
       }
       
@@ -1063,7 +1071,7 @@
           if (priceSave) priceSave.style.display = 'none';
         }
 
-        // Update availability - check all locations
+        // Update availability - check all locations (especially for AutoDS)
         const submitBtn = document.getElementById('product-submit-button');
         if (submitBtn) {
           // Initial check using variant data
@@ -1073,12 +1081,13 @@
           const hasQuantity = (matchingVariant.inventory_quantity || 0) > 0;
           const canContinue = matchingVariant.inventory_policy === 'continue';
           
-          // Only show sold out if: tracked, no quantity, AND can't continue selling
+          // For AutoDS: inventory_quantity might be 0 but product is still available
+          // Only show sold out initially if: tracked, no quantity, AND can't continue selling
           if (isTracked && !hasQuantity && !canContinue) {
             isAvailable = false;
           }
           
-          // Double-check via API for all locations
+          // Always check via API (API is source of truth for AutoDS)
           (async function() {
             try {
               const productHandle = '{{ product.handle }}';
@@ -1086,8 +1095,8 @@
               const productData = await response.json();
               const variant = productData.variants.find(v => v.id === matchingVariant.id);
               
-              if (variant && variant.available !== isAvailable) {
-                // API says different - update button
+              if (variant) {
+                // API is the source of truth - always use it
                 isAvailable = variant.available;
                 if (submitBtn) {
                   if (isAvailable) {
@@ -1100,6 +1109,11 @@
                     submitBtn.style.opacity = '1';
                   }
                 }
+                console.log('Variant availability updated from API:', {
+                  variantId: matchingVariant.id,
+                  apiAvailable: variant.available,
+                  buttonText: submitBtn.textContent
+                });
               }
             } catch (error) {
               console.error('Error checking availability:', error);
