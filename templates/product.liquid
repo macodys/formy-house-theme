@@ -615,15 +615,18 @@
   }
 
   .product-form__submit:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--color-accent, #d4af37) 0%, #c09825 100%);
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    color: #ffffff;
     transform: translateY(-3px);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
   }
 
   .product-form__submit:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
     transform: none;
+    background: linear-gradient(135deg, #666666 0%, #555555 100%);
+    color: #ffffff;
   }
 
   .product-form__submit:active:not(:disabled) {
@@ -866,9 +869,19 @@
     if (currentVariantId && submitBtn) {
       const currentVariant = variantData.find(v => v.id === currentVariantId);
       
-      // Always show as available - let Shopify handle inventory at checkout
-      // This prevents false "sold out" messages due to location/inventory sync issues
-      let isAvailable = true;
+      // Check inventory - show sold out only if truly unavailable
+      let isAvailable = true; // Default to available
+      
+      if (currentVariant) {
+        const isTracked = currentVariant.inventory_management && currentVariant.inventory_management !== '';
+        const hasQuantity = (currentVariant.inventory_quantity || 0) > 0;
+        const canContinue = currentVariant.inventory_policy === 'continue';
+        
+        // Only show sold out if: tracked, no quantity, AND can't continue selling
+        if (isTracked && !hasQuantity && !canContinue) {
+          isAvailable = false;
+        }
+      }
       
       if (isAvailable) {
         submitBtn.disabled = false;
@@ -877,14 +890,15 @@
       } else {
         submitBtn.disabled = true;
         submitBtn.textContent = 'SOLD OUT';
-        submitBtn.style.opacity = '0.5';
+        submitBtn.style.opacity = '1';
       }
       
       console.log('Product button initialized:', {
         variantId: currentVariantId,
-        alwaysAvailable: true,
-        buttonText: submitBtn.textContent,
-        note: 'Button always shows ADD TO CART - Shopify handles inventory at checkout'
+        inventoryQuantity: currentVariant ? currentVariant.inventory_quantity : 'N/A',
+        inventoryPolicy: currentVariant ? currentVariant.inventory_policy : 'N/A',
+        calculatedAvailable: isAvailable,
+        buttonText: submitBtn.textContent
       });
     }
     
@@ -1004,14 +1018,23 @@
         // Update availability
         const submitBtn = document.getElementById('product-submit-button');
         if (submitBtn) {
-          // Always show as available - let Shopify handle inventory at checkout
-          // This prevents false "sold out" messages due to location/inventory sync issues
-          let isAvailable = true;
+          // Check inventory - show sold out only if truly unavailable
+          let isAvailable = true; // Default to available
+          
+          const isTracked = matchingVariant.inventory_management && matchingVariant.inventory_management !== '';
+          const hasQuantity = (matchingVariant.inventory_quantity || 0) > 0;
+          const canContinue = matchingVariant.inventory_policy === 'continue';
+          
+          // Only show sold out if: tracked, no quantity, AND can't continue selling
+          if (isTracked && !hasQuantity && !canContinue) {
+            isAvailable = false;
+          }
           
           console.log('Updating button for variant:', {
             variantId: matchingVariant.id,
-            alwaysAvailable: true,
-            note: 'Button always shows ADD TO CART - Shopify handles inventory at checkout'
+            inventoryQuantity: matchingVariant.inventory_quantity,
+            inventoryPolicy: matchingVariant.inventory_policy,
+            calculatedAvailable: isAvailable
           });
           
           if (isAvailable) {
@@ -1021,7 +1044,7 @@
           } else {
             submitBtn.disabled = true;
             submitBtn.textContent = 'SOLD OUT';
-            submitBtn.style.opacity = '0.5';
+            submitBtn.style.opacity = '1';
           }
         }
 
