@@ -866,16 +866,23 @@
     if (currentVariantId && submitBtn) {
       const currentVariant = variantData.find(v => v.id === currentVariantId);
       
-      // Check inventory quantity instead of just 'available' flag
-      let isAvailable = true; // Default to available
+      // Check inventory - default to available unless explicitly sold out
+      let isAvailable = true; // Default to available (safer)
       
       if (currentVariant) {
-        // If inventory is tracked, check quantity
-        if (currentVariant.inventory_management === 'shopify') {
-          // Check if we have inventory OR if we allow continue selling when out of stock
-          isAvailable = currentVariant.inventory_quantity > 0 || currentVariant.inventory_policy === 'continue';
+        // Only mark as sold out if:
+        // 1. Inventory is tracked by Shopify
+        // 2. Quantity is 0 or less
+        // 3. AND policy is 'deny' (don't continue selling)
+        const isTracked = currentVariant.inventory_management && currentVariant.inventory_management !== '';
+        const hasQuantity = (currentVariant.inventory_quantity || 0) > 0;
+        const canContinue = currentVariant.inventory_policy === 'continue';
+        
+        // Only show sold out if tracked, no quantity, and can't continue
+        if (isTracked && !hasQuantity && !canContinue) {
+          isAvailable = false;
         } else {
-          // Inventory not tracked, always available
+          // In all other cases, show as available
           isAvailable = true;
         }
       }
@@ -1017,14 +1024,22 @@
         // Update availability
         const submitBtn = document.getElementById('product-submit-button');
         if (submitBtn) {
-          // Check inventory quantity instead of just 'available' flag
-          let isAvailable = true;
+          // Check inventory - default to available unless explicitly sold out
+          let isAvailable = true; // Default to available (safer)
           
-          if (matchingVariant.inventory_management === 'shopify') {
-            // Check if we have inventory OR if we allow continue selling when out of stock
-            isAvailable = matchingVariant.inventory_quantity > 0 || matchingVariant.inventory_policy === 'continue';
+          // Only mark as sold out if:
+          // 1. Inventory is tracked by Shopify
+          // 2. Quantity is 0 or less
+          // 3. AND policy is 'deny' (don't continue selling)
+          const isTracked = matchingVariant.inventory_management && matchingVariant.inventory_management !== '';
+          const hasQuantity = (matchingVariant.inventory_quantity || 0) > 0;
+          const canContinue = matchingVariant.inventory_policy === 'continue';
+          
+          // Only show sold out if tracked, no quantity, and can't continue
+          if (isTracked && !hasQuantity && !canContinue) {
+            isAvailable = false;
           } else {
-            // Inventory not tracked, always available
+            // In all other cases, show as available
             isAvailable = true;
           }
           
